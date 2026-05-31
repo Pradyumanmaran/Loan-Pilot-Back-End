@@ -12,14 +12,17 @@ import (
 func main() {
 
 	err := godotenv.Load()
-	log.Println("Gemini Key Loaded:", os.Getenv("GEMINI_API_KEY") != "")
 	if err != nil {
 		log.Println("No .env file found")
 	}
+
+	log.Println("Gemini Key Loaded:", os.Getenv("GEMINI_API_KEY") != "")
+
 	app := fiber.New()
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5173",
-		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowOrigins: "*",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 	}))
 
@@ -31,5 +34,13 @@ func main() {
 		})
 	})
 
-	log.Fatal(app.Listen(":3000"))
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "3000"
+	}
+
+	log.Printf("Server starting on port %s", port)
+
+	log.Fatal(app.Listen(":" + port))
 }
